@@ -13,14 +13,32 @@
     src: url('font/RobotoCondensed-Bold.ttf');
 }
 
+@font-face {
+	font-family: number;
+	src: url('font/RobotoCondensed-Light.ttf');
+}
+
 #defaultCanvas0 {
 	position: fixed;
 	left: 0px;
 	top: 0px;
+	opacity: 0;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	transition: all 1s;
 }
 
-.headline1, .headline2 {
-	left: 100px;
+.race-labels {
+	opacity: 0;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	transition: all 1s;
+}
+
+.headline {
+	left: 50px;
 	top: 140px;
 	width: 250px;
 	position: fixed;
@@ -31,20 +49,12 @@
 	-moz-transition: all 1s;
 	-ms-transition: all 1s;
 	transition: all 1s;
-}
-
-
-.headline1 {
-	opacity: 1;
-}
-
-.headline2 {
 	opacity: 0;
 }
 
-.copy1, .copy2  {
+.copy  {
 	position: fixed;
-	left: 100px;
+	left: 50px;
 	top: 220px;
 	width: 280px;
 	overflow: auto;
@@ -55,15 +65,19 @@
 	-moz-transition: all 1s;
 	-ms-transition: all 1s;
 	transition: all 1s;
-
+	opacity: 0;
 }
 
-.copy1 {
+.copy0 {
 	opacity: 1;
 }
 
-.copy2 {
-	opacity: 0;
+.copy0, .copy4 {
+	width: 500px;
+}
+
+.headline0 {
+	opacity: 1;
 }
 
 .race-labels {
@@ -75,8 +89,16 @@
 	z-index: 99;
 	font-family: label, arial, sans-serif;
 	font-size: 14px;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	transition: all 1s;
 }
 
 .race-labels .label {
+	position: absolute;
+}
+
+.race-labels .number {
 	position: absolute;
 }
