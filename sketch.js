@@ -1,112 +1,106 @@
 var keys = Object.keys;
 
-var Graph;
+var App, Graph, Bar, app, graph, bar;
 
-var graph;
+// views
+const INTRO = 0;
+const RACE = 1;
+const ETHNICITY = 2;
+const SIZE = 3;
+const SIZE_COLLAPSE = 4;
+const PERCAPITA = 5;
+const OUTRO = 6;
 
-const VIEW_INTRODUCTION = 0;
-const VIEW1 = 1;
-const VIEW2 = 2;
-const VIEW3 = 3;
-const VIEW_CONCLUSION = 4
+var view = INTRO;
+var targetView = null;
 
-var view = VIEW_INTRODUCTION;
+// bars
+const PRIMARY = 1;
+const SECONDARY = 2;
 
 function setup() {
 	createCanvas(1024, 768);
 	noStroke();
 	background(255);
 	graph = new Graph();
+	app = new App();
 }
 
 function draw() {
 	graph.draw();
 	graph.update();
+	app.update();
 }
 
 
+var Bar = function(i, viewProps) {
 
-Bar = function(i, x, y1, y2, w1, w2, h, r, g, b, a1, a2, label, labelA1, labelA2, startAmt) {
+	var views = viewProps;
 
-	var amt = startAmt;
-	var amt2 = startAmt;
+	var draw = function(view1, view2, amt) {
 
-	const RACE = 0;
-	const ETHNICITY = 1;
+		console.log(view1, view2, amt);
 
-	const HOUSEHOLD = 0;
-	const PERCAPITA = 1;
+		// primary bars
+		var r1 = lerp(views[view1][PRIMARY]['r'], views[view2][PRIMARY]['r'], amt);
+		var g1 = lerp(views[view1][PRIMARY]['g'], views[view2][PRIMARY]['g'], amt);
+		var b1 = lerp(views[view1][PRIMARY]['b'], views[view2][PRIMARY]['b'], amt);
+		var a1 = lerp(views[view1][PRIMARY]['a'], views[view2][PRIMARY]['a'], amt);
+		fill(r1, g1, b1, map(a1, 0, 1, 0, 100));
 
-	var update = function(newAmt, newAmt2) {
-		amt = newAmt;	
-		amt2 = newAmt2;
-		$('.race-labels .label').each(function(index) {
+		var x1 = lerp(views[view1][PRIMARY]['x'], views[view2][PRIMARY]['x'], amt);
+		var y1 = lerp(views[view1][PRIMARY]['y'], views[view2][PRIMARY]['y'], amt);
+		var w1 = lerp(views[view1][PRIMARY]['w'], views[view2][PRIMARY]['w'], amt);
+		var h1 = lerp(views[view1][PRIMARY]['h'], views[view2][PRIMARY]['h'], amt);
+		rect(x1, y1, w1, h1);
+
+		// secondary bars
+		var r2 = lerp(views[view1][SECONDARY]['r'], views[view2][SECONDARY]['r'], amt);
+		var g2 = lerp(views[view1][SECONDARY]['g'], views[view2][SECONDARY]['g'], amt);
+		var b2 = lerp(views[view1][SECONDARY]['b'], views[view2][SECONDARY]['b'], amt);
+		var a2 = lerp(views[view1][SECONDARY]['a'], views[view2][SECONDARY]['a'], amt);
+		fill(r2, g2, b2, map(a2, 0, 1, 0, 100));
+
+		var x2 = lerp(views[view1][SECONDARY]['x'], views[view2][SECONDARY]['x'], amt);
+		var y2 = lerp(views[view1][SECONDARY]['y'], views[view2][SECONDARY]['y'], amt);
+		var w2 = lerp(views[view1][SECONDARY]['w'], views[view2][SECONDARY]['w'], amt);
+		var h2 = lerp(views[view1][SECONDARY]['h'], views[view2][SECONDARY]['h'], amt);
+		rect(x2, y2, w2, h2);
+
+		// left labels
+
+		$('.labels .left-label').each(function(index) {
 			if (i === index) {
 				$(this).css({ 
-					'margin-top': (lerp(y1, y2, amt)).toString() + 'px', 
-					'opacity': lerp(labelA1, labelA2, amt)
+					'margin-top': y2.toString() + 'px', 
+					'opacity': map(a1, 0, 100, 0, 1)
 				});
 			}
 		});
-		$('.race-labels .number').each(function(index) {
-			if (i === index) {
-				$(this).css({ 
-					'margin-top': (lerp(y1, y2, amt)).toString() + 'px', 
-					'opacity': lerp(labelA1, labelA2, amt)
-				});
-			}
-		});
-
-	}
-
-	var draw = function() {
-
-		fill(r, g, b, map(lerp(a1, a2, amt), 0, 1, 0, 100));
-		rect(x, lerp(y1, y2, amt), lerp(w1, w2, amt2), h);
-
-		if (a1 !== 0) {
-			fill(r, g, b, map(lerp(a1, a2, amt), 0, 1, 0, 30));
-			rect(x, lerp(y1, y2, amt), w1, h);
-		}
-		
 
 	};
 
 	return {
-		'draw': draw,
-		'update': update
+		'draw': draw
 	};
 };
 
-
-
-
-Graph = function() {
-
-	const RACE = 0;
-	const ETHNICITY = 1;
-
-	const HOUSEHOLD = 0;
-	const PERCAPITA = 1;
+var Graph = function() {
 
 	var amt = new SoftFloat(0);
-	var amt2 = new SoftFloat(0);
-
-	amt.setTarget(RACE);
-	amt2.setTarget(HOUSEHOLD);
 
 	var bars = [];
-
+	
 	var catToColor = {
-		'All': { 'r': 100, 'g': 100, 'b': 50 },
 		'Asian': { 'r': 0, 'g': 0, 'b': 200 },
 		'Black': { 'r': 50, 'g': 100, 'b': 255 },
 		'White': { 'r': 200, 'g': 50, 'b': 100 },
 		'Hispanic': { 'r': 150, 'g': 200, 'b': 150 }
 	};
 
-	var initGraph = function() {
-		
+
+	function initBars() {
+
 		var races = keys(data.race);
 		var ethnicities = keys(data.ethnicity);
 		
@@ -124,180 +118,331 @@ Graph = function() {
 		}
 
 		for (var i = 0; i < cats.length; i++) {
+
 			var cat = cats[i];
-			var x = 480;
-			if (races.indexOf(cat) !== -1) {
-				var y1 = 122 + 25 * races.indexOf(cat);
-			} else {
-				var y1 = 122 + 25 * races.indexOf('Asian');
-			}
-			if (races.indexOf(cat) !== - 1 && i > races.indexOf('Asian')) {
-				var y2 = 147 + 25 * (i - 1);
-			} else {
-				var y2 = 147 + 25 * i;
-			}
-			if (races.indexOf(cat) !== -1) {
-				var w1 = data.race[cat] * 5;
-			} else {
-				var w1 = data.ethnicity[cat] * 5;
-			}
-			if (races.indexOf(cat) !== -1) {
-				var w2 = data.percapita[cat] * 5;
-			} else {
-				var w2 = data.ethnicity[cat] * 5;
-			}
-			var h = 20;
-			if (cat in catToColor) {
-				var r = catToColor[cat]['r']; 
-				var g = catToColor[cat]['g'];
-				var b = catToColor[cat]['b'];
-			} else {
-				var r = catToColor['Asian']['r'];
-				var g = catToColor['Asian']['g'];
-				var b = catToColor['Asian']['b'];
-			}
-			if (races.indexOf(cat) !== -1) {
-				if (cat === 'Asian') {
-					var a1 = 1;
-					var a2 = 0;
+
+			var views = {};
+
+			var collapsedY = (function() {
+				if (races.indexOf(cat) !== -1) {
+					return 122 + 25 * races.indexOf(cat);
 				} else {
-					var a1 = 1;
-					var a2 = .3;
+					return 122 + 25 * races.indexOf('Asian');
 				}
-			} else {
-				var a1 = 0;
-				var a2 = 1;
-			}
-			var label = cat;
-			if (races.indexOf(cat) !== -1) {
-				if (cat === 'Asian') {
-					var labelA1 = 1;
-					var labelA2 = 0;
+			})();
+
+			var expandedY = (function() {
+				if (races.indexOf(cat) !== - 1 && i > races.indexOf('Asian')) {
+					return 147 + 25 * (i - 1);
 				} else {
-					var labelA1 = 1;
-					var labelA2 = .3;
+					return 147 + 25 * i;
 				}
-			} else {
-				var labelA1 = 0;
-				var labelA2 = 1;
-			}
-			var amt = 0;
-			var bar = new Bar(
-				i, x, y1, y2, w1, w2, h, r, g, 
-				b, a1, a2, label, labelA1, labelA2, amt
-			);
+			})();
+
+			var householdIncomeW = (function() {
+				if (races.indexOf(cat) !== -1) {
+					return data.race[cat] * 5;
+				} else {
+					return data.ethnicity[cat] * 5;
+				}
+			})();
+
+			var householdSizeW = (function() {
+				if (races.indexOf(cat) !== -1) {
+					return data.size[cat] * 30;
+				} else {
+					return 0;
+				}
+			})();
+
+			var percapitaIncomeW = (function() {
+				if (races.indexOf(cat) !== -1) {
+					return data.percapita[cat] * 5;
+				} else {
+					return 0;
+				}
+			})();
+
+			var r = cat in catToColor ? catToColor[cat]['r'] : catToColor['Asian']['r'];
+			var g = cat in catToColor ? catToColor[cat]['g'] : catToColor['Asian']['g'];
+			var b = cat in catToColor ? catToColor[cat]['b'] : catToColor['Asian']['b'];
+
+			var raceA = races.indexOf(cat) !== -1 ? 1 : 0;
+			var ethnicityA = (function() {
+				if (races.indexOf(cat) !== -1) {
+					if (cat === 'Asian') {
+						return 0;
+					} else {
+						return .3;
+					}
+				} else {
+					return 1;
+				}	
+			})();
+			var secondaryRaceA = races.indexOf(cat) !== -1 ? .2 : 0;
+
+			views[INTRO] = {};
+			views[RACE] = {};
+			views[ETHNICITY] = {};
+			views[SIZE] = {};
+			views[SIZE_COLLAPSE] = {};
+			views[PERCAPITA] = {};
+			views[OUTRO] = {};
+
+			views[INTRO][PRIMARY] = {	
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+			views[INTRO][SECONDARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+			views[RACE][PRIMARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': raceA,
+			};
+			views[RACE][SECONDARY] = { 
+				'x': 480,
+				'y': collapsedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0,
+			};
+			views[ETHNICITY][PRIMARY] = {
+				'x': 480,
+				'y': expandedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': ethnicityA
+			};
+			views[ETHNICITY][SECONDARY] = { 
+				'x': 480,
+				'y': expandedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+			views[SIZE][PRIMARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': householdSizeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': raceA,
+			};
+			views[SIZE][SECONDARY] = {
+				'x': 480,
+				'y': expandedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+			views[SIZE_COLLAPSE][PRIMARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': raceA,
+			};
+			views[SIZE_COLLAPSE][SECONDARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0,
+			};
+			views[PERCAPITA][PRIMARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': percapitaIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': raceA,
+			};
+			views[PERCAPITA][SECONDARY] = { 
+				'x': 480,
+				'y': collapsedY,
+				'w': householdIncomeW,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': secondaryRaceA,
+			};
+			views[OUTRO][PRIMARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+			views[OUTRO][SECONDARY] = {
+				'x': 480,
+				'y': collapsedY,
+				'w': 0,
+				'h': 20,
+				'r': r,
+				'g': g,
+				'b': b,
+				'a': 0
+			};
+
+			var bar = new Bar(i, views);
 			bars.push(bar);
 
+
 			$('<div>')
-				.addClass('label')
+				.addClass('left-label')
 				.css({
 					'margin-left': 400,
-					'margin-top': y1.toString() + 'px'
+					'margin-top': collapsedY.toString() + 'px'
 				})
-				.text(label)
-				.appendTo($('.race-labels'));
-
-			$('<div>')
-				.addClass('number')
-				.css({
-					'margin-left': 400 + w1 + 40,
-					'margin-top': y1.toString() + 'px'
-				})
-				.text("$" + (w1 / 5).toString() + "k")
-				.appendTo($('.race-labels'));
+				.text(cat)
+				.appendTo($('.labels'));
 		}
-		background(255);
-		drawBars();
-	};
 
 
-	var update = function() {
-		amt.update();
-		amt2.update();
-		for (var i = 0; i < bars.length; i++) {
-			bars[i].update(amt.get(), amt2.get());
-		}
-	};
-
-
-	var drawBars = function() {
-		for (var i = 0; i < bars.length; i++) {
-			bars[i].draw();
-		}
-	};
-
+	}
 
 	var draw = function() {
-		if (!amt.atTarget() || !amt2.atTarget()) {
+		if (targetView !== null) {
 			background(255);
-			drawBars();
+			for (var i = 0; i < bars.length; i++) {
+				bars[i].draw(view, targetView, amt.get());
+			}
 		}
 	};
 
+	var update = function() {
 
-	var toggleView = function() {
+		if (targetView !== null) {
+			amt.setTarget(1);
+			amt.update();
 
-		if (view === VIEW_INTRODUCTION) {
-
-			amt.setTarget(RACE);
-			amt2.setTarget(HOUSEHOLD);
-			
-			$('#defaultCanvas0').css('opacity', 1);
-			$('.copy1, .copy2, .copy3, .headline1, .headline2, .headline3').css('opacity', 1);
-			$('.race-labels').css('opacity', 1);
-			$('#defaultCanvas0').css('opacity', 1);
-			$('.race-labels').css('opacity', 1);
-
-			$('.headline, .copy').css('opacity', 0);
-			$('.headline1, .copy1').css('opacity', 1);
-			
-			view = VIEW1;
-
-		} else if (view === VIEW1) {
-
-			amt.setTarget(ETHNICITY);
-			amt2.setTarget(HOUSEHOLD);
-
-			$('.headline, .copy').css('opacity', 0);
-			$('.headline2, .copy2').css('opacity', 1);
-
-			view = VIEW2;
-
-		} else if (view === VIEW2) {
-
-			amt.setTarget(RACE);
-			amt2.setTarget(PERCAPITA);
-
-			$('.headline, .copy').css('opacity', 0);
-			$('.headline3, .copy3').css('opacity', 1);
-
-			view = VIEW3;
-
-		} else if (view === VIEW3) {
-
-
-			$('#defaultCanvas0').css('opacity', 0);
-			$('.copy1, .copy2, .copy3, .headline1, .headline2, .headline3').css('opacity', 0);
-			$('.race-labels').css('opacity', 0);
-			$('#defaultCanvas0').css('opacity', 0);
-			$('.race-labels').css('opacity', 0);
-			$('.headline, .copy').css('opacity', 0);
-			$('.headline4, .copy4').css('opacity', 1);
-
-			view = VIEW_CONCLUSION;
+			if (amt.atTarget()) {
+				view = targetView;
+				targetView = null;
+				amt.set(0);
+				if (view === SIZE_COLLAPSE) {
+					targetView = PERCAPITA;
+				}
+			}
 		}
+		
 	};
 
-	initGraph();
+	initBars();
 
 	return {
-		'draw': draw,
-		'toggleView': toggleView,
+		'update': update,
+		'draw': draw
+	};
+
+};
+
+var App = function() {
+
+	var appView = INTRO;
+
+	$('#defaultCanvas0, .copy, .labels').css('opacity', 0);
+	$('.copy.intro, .headline.intro').css('opacity', 1);
+
+	var update = function() {
+
+		if (appView !== targetView) {
+			
+			appView = targetView;
+
+			switch(appView) {
+
+				case RACE:
+					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.race, .headline.race').css('opacity', 1);
+					break;
+				
+				case ETHNICITY:
+					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.ethnicity, .headline.ethnicity').css('opacity', 1);
+					break;
+				
+				case SIZE:
+					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.size, .headline.size').css('opacity', 1);
+					break;
+
+				case PERCAPITA:
+					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.percapita, .headline.percapita').css('opacity', 1);
+					break;
+				
+				case OUTRO:
+					$('#defaultCanvas0, .copy, .labels').css('opacity', 0);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.outro, .headline.outro').css('opacity', 1);
+					break;
+			}
+
+		}
+	}
+
+	return {
 		'update': update
 	};
-};
+}
 
 
 function mouseClicked() { 
-	graph.toggleView();
+
+	if (view === SIZE_COLLAPSE) {
+		targetView = OUTRO;
+	} else {
+		targetView = view + 1;
+	}
 }

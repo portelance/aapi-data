@@ -29,7 +29,7 @@
 	transition: all 1s;
 }
 
-.race-labels {
+.labels {
 	opacity: 0;
 	-webkit-transition: all 1s;
 	-moz-transition: all 1s;
@@ -39,11 +39,11 @@
 
 .headline {
 	left: 50px;
-	top: 140px;
-	width: 250px;
+	top: 100px;
+	width: 300px;
 	position: fixed;
 	font-family: headline;
-	font-size: 24px;
+	font-size: 20px;
 	z-index: 99;
 	-webkit-transition: all 1s;
 	-moz-transition: all 1s;
@@ -55,7 +55,7 @@
 .copy  {
 	position: fixed;
 	left: 50px;
-	top: 220px;
+	top: 140px;
 	width: 280px;
 	overflow: auto;
 	font-family: copy;
@@ -68,19 +68,17 @@
 	opacity: 0;
 }
 
-.copy0 {
-	opacity: 1;
+.copy-p {
+	margin-bottom: 12px;
 }
 
-.copy0, .copy4 {
+
+.copy.intro, .copy.outro {
 	width: 500px;
 }
 
-.headline0 {
-	opacity: 1;
-}
 
-.race-labels {
+.labels {
 	width: 1024px;
 	height: 768px;
 	position: fixed;
@@ -95,10 +93,10 @@
 	transition: all 1s;
 }
 
-.race-labels .label {
+.labels .left-label {
 	position: absolute;
 }
 
-.race-labels .number {
+.labels .right-label {
 	position: absolute;
 }
