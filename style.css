@@ -1,0 +1,82 @@
+@font-face {
+	font-family: headline;
+	src: url('font/PT_Serif-Web-Bold.ttf');
+}
+
+@font-face {
+	font-family: copy;
+	src: url('font/PT_Serif-Web-Regular.ttf');
+}
+
+@font-face {
+    font-family: label;
+    src: url('font/RobotoCondensed-Bold.ttf');
+}
+
+#defaultCanvas0 {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+}
+
+.headline1, .headline2 {
+	left: 100px;
+	top: 140px;
+	width: 250px;
+	position: fixed;
+	font-family: headline;
+	font-size: 24px;
+	z-index: 99;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	transition: all 1s;
+}
+
+
+.headline1 {
+	opacity: 1;
+}
+
+.headline2 {
+	opacity: 0;
+}
+
+.copy1, .copy2  {
+	position: fixed;
+	left: 100px;
+	top: 220px;
+	width: 280px;
+	overflow: auto;
+	font-family: copy;
+	font-size: 16px;
+	z-index: 99;
+	-webkit-transition: all 1s;
+	-moz-transition: all 1s;
+	-ms-transition: all 1s;
+	transition: all 1s;
+
+}
+
+.copy1 {
+	opacity: 1;
+}
+
+.copy2 {
+	opacity: 0;
+}
+
+.race-labels {
+	width: 1024px;
+	height: 768px;
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	z-index: 99;
+	font-family: label, arial, sans-serif;
+	font-size: 14px;
+}
+
+.race-labels .label {
+	position: absolute;
+}
