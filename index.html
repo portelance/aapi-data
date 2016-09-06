@@ -1,10 +1,13 @@
 <html>
 <head>
-	<title>AAPI Data</title>
+	<title>The Model Minority Myth</title>
 	<meta charset="UTF-8">
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<script language="javascript" type="text/javascript" src="jquery-3.1.0.slim.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="style/style.css">
+	<link rel="stylesheet" type="text/css" href="style/bootstrap.min.css">
+	<script language="javascript" type="text/javascript" src="libraries/jquery-3.1.0.slim.min.js"></script>
 	<script language="javascript" type="text/javascript" src="libraries/softfloat.js"></script>
+	<script language="javascript" type="text/javascript" src="libraries/bootstrap.min.js"></script>
+	<script language="javascript" type="text/javascript" src="libraries/bootbox.min.js"></script>
 	<script language="javascript" type="text/javascript" src="data.js"></script>
 	<script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
 	<script language="javascript" type="text/javascript" src="sketch.js"></script>
@@ -41,5 +44,32 @@ We want to acknowledge that this simple infographic only scratches the surface o
 
 </div>
 	<div class="labels"></div>
+	<div class="next"><strong>Next</strong></div>
+
+	<div class="about-link">About</div>
+	
+
+
+
+
+<script language="javascript" type="text/javascript">
+	
+	$('.next').on('click', function() {
+		if (view === SIZE_COLLAPSE) {
+			targetView = OUTRO;
+		} else if (view === OUTRO) {
+			targetView = INTRO;
+		} else {
+			targetView = view + 1;
+		}
+	});
+
+	$('.about-link').on('click', function() {
+		bootbox.dialog({
+  			message: "<div class='about'>All data referenced in this visualization is provided by the <a href='http://www.census.gov'>U.S. Census Bureau</a>.<strong><br/><br/><strong>Authors</strong><br/><br/>Suyu Zhang</strong> is a first generation immigrant AAPI of Chinese and Japanese cultural heritage based in Brooklyn, NY. He graduated from Tufts University in 2013 with a passion for social justice.<br/><br/><strong>Dylan Portelance</strong> is a multiracial AAPI of Japanese descent living in Cambridge, MA. He studied child development and computer science at Tufts University and loves to design tools for learning.</div>"
+		});
+	});
+
+</script>
 </body>
 </html>

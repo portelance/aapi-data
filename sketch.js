@@ -33,20 +33,18 @@ function draw() {
 }
 
 
-var Bar = function(i, viewProps) {
+var Bar = function(i, viewProps, $nameLabel, $hhIncomeLabel, $hhSizeLabel, $percapitaLabel) {
 
 	var views = viewProps;
 
 	var draw = function(view1, view2, amt) {
-
-		console.log(view1, view2, amt);
 
 		// primary bars
 		var r1 = lerp(views[view1][PRIMARY]['r'], views[view2][PRIMARY]['r'], amt);
 		var g1 = lerp(views[view1][PRIMARY]['g'], views[view2][PRIMARY]['g'], amt);
 		var b1 = lerp(views[view1][PRIMARY]['b'], views[view2][PRIMARY]['b'], amt);
 		var a1 = lerp(views[view1][PRIMARY]['a'], views[view2][PRIMARY]['a'], amt);
-		fill(r1, g1, b1, map(a1, 0, 1, 0, 100));
+		fill(r1, g1, b1, map(a1, 0, 1, 0, 150));
 
 		var x1 = lerp(views[view1][PRIMARY]['x'], views[view2][PRIMARY]['x'], amt);
 		var y1 = lerp(views[view1][PRIMARY]['y'], views[view2][PRIMARY]['y'], amt);
@@ -59,7 +57,7 @@ var Bar = function(i, viewProps) {
 		var g2 = lerp(views[view1][SECONDARY]['g'], views[view2][SECONDARY]['g'], amt);
 		var b2 = lerp(views[view1][SECONDARY]['b'], views[view2][SECONDARY]['b'], amt);
 		var a2 = lerp(views[view1][SECONDARY]['a'], views[view2][SECONDARY]['a'], amt);
-		fill(r2, g2, b2, map(a2, 0, 1, 0, 100));
+		fill(r2, g2, b2, map(a2, 0, 1, 0, 150));
 
 		var x2 = lerp(views[view1][SECONDARY]['x'], views[view2][SECONDARY]['x'], amt);
 		var y2 = lerp(views[view1][SECONDARY]['y'], views[view2][SECONDARY]['y'], amt);
@@ -67,17 +65,43 @@ var Bar = function(i, viewProps) {
 		var h2 = lerp(views[view1][SECONDARY]['h'], views[view2][SECONDARY]['h'], amt);
 		rect(x2, y2, w2, h2);
 
-		// left labels
-
-		$('.labels .left-label').each(function(index) {
-			if (i === index) {
-				$(this).css({ 
-					'margin-top': y2.toString() + 'px', 
-					'opacity': map(a1, 0, 100, 0, 1)
-				});
-			}
+		$nameLabel.css({ 
+			'margin-top': y1.toString() + 'px', 
+			'opacity': a1
 		});
 
+		if (view2 === RACE || view2 === ETHNICITY)
+			var hhIncomeLabelA = a1;
+		else
+			var hhIncomeLabelA = 0;
+
+		if (view2 === SIZE)
+			var hhSizeLabelA = a1;
+		else
+			var hhSizeLabelA = 0;
+
+		if (view2 === PERCAPITA)
+			var percapitaLabelA = a1;
+		else
+			var percapitaLabelA = 0;
+
+		$hhIncomeLabel.css({
+			'margin-top': y1.toString() + 'px', 
+			'margin-left': (x1 + w1 + 10).toString() + 'px', 
+			'opacity': hhIncomeLabelA
+		});
+
+		$hhSizeLabel.css({
+			'margin-top': y1.toString() + 'px', 
+			'margin-left': (x1 + w1 + 10).toString() + 'px', 
+			'opacity': hhSizeLabelA
+		});
+
+		$percapitaLabel.css({
+			'margin-top': y1.toString() + 'px', 
+			'margin-left': (x1 + w1 + 10).toString() + 'px', 
+			'opacity': percapitaLabelA
+		});
 	};
 
 	return {
@@ -125,17 +149,17 @@ var Graph = function() {
 
 			var collapsedY = (function() {
 				if (races.indexOf(cat) !== -1) {
-					return 122 + 25 * races.indexOf(cat);
+					return 100 + 25 * races.indexOf(cat);
 				} else {
-					return 122 + 25 * races.indexOf('Asian');
+					return 100 + 25 * races.indexOf('Asian');
 				}
 			})();
 
 			var expandedY = (function() {
 				if (races.indexOf(cat) !== - 1 && i > races.indexOf('Asian')) {
-					return 147 + 25 * (i - 1);
+					return 125 + 25 * (i - 1);
 				} else {
-					return 147 + 25 * i;
+					return 125 + 25 * i;
 				}
 			})();
 
@@ -151,7 +175,7 @@ var Graph = function() {
 				if (races.indexOf(cat) !== -1) {
 					return data.size[cat] * 30;
 				} else {
-					return 0;
+					return "";
 				}
 			})();
 
@@ -277,7 +301,7 @@ var Graph = function() {
 				'r': r,
 				'g': g,
 				'b': b,
-				'a': raceA,
+				'a': 0,
 			};
 			views[SIZE_COLLAPSE][SECONDARY] = {
 				'x': 480,
@@ -330,18 +354,50 @@ var Graph = function() {
 				'a': 0
 			};
 
-			var bar = new Bar(i, views);
-			bars.push(bar);
-
-
-			$('<div>')
-				.addClass('left-label')
+			var $nameLabel = $('<div>')
+				.addClass('name-label')
 				.css({
 					'margin-left': 400,
-					'margin-top': collapsedY.toString() + 'px'
+					'margin-top': collapsedY.toString() + 'px',
+					'opacity': 0
 				})
 				.text(cat)
 				.appendTo($('.labels'));
+
+			var $hhIncomeLabel = $('<div>')
+				.addClass('hhincome-label')
+				.css({
+					'margin-left': 480 + householdIncomeW * 5 + 10,
+					'margin-top': collapsedY.toString() + 'px',
+					'opacity': 0
+				})
+				.text("$" + (householdIncomeW / 5).toString() + "k")
+				.appendTo($('.labels'));
+
+			var $hhSizeLabel = $('<div>')
+				.addClass('hhsize-label')
+				.css({
+					'margin-left': 480 + householdSizeW * 30 + 10,
+					'margin-top': collapsedY.toString() + 'px',
+					'opacity': 0
+				})
+				.text(householdSizeW !== "" ? (householdSizeW / 30).toString() : "")
+				.appendTo($('.labels'));
+
+			var $percapitaLabel = $('<div>')
+				.addClass('percapita-label')
+				.css({
+					'margin-left': 480 + percapitaIncomeW * 5 + 10,
+					'margin-top': collapsedY.toString() + 'px',
+					'opacity': 0
+				})
+				.text("$" + (percapitaIncomeW / 5).toString() + "k")
+				.appendTo($('.labels'));
+
+
+			var bar = new Bar(i, views, $nameLabel, $hhIncomeLabel, $hhSizeLabel, $percapitaLabel);
+			bars.push(bar);
+
 		}
 
 
@@ -363,6 +419,7 @@ var Graph = function() {
 			amt.update();
 
 			if (amt.atTarget()) {
+				draw();
 				view = targetView;
 				targetView = null;
 				amt.set(0);
@@ -387,7 +444,7 @@ var App = function() {
 
 	var appView = INTRO;
 
-	$('#defaultCanvas0, .copy, .labels').css('opacity', 0);
+	$('#defaultCanvas0, .copy').css('opacity', 0);
 	$('.copy.intro, .headline.intro').css('opacity', 1);
 
 	var update = function() {
@@ -398,32 +455,40 @@ var App = function() {
 
 			switch(appView) {
 
+				case INTRO: 
+					$('.next').text('Next');
+					$('#defaultCanvas0, .copy').css('opacity', 0);
+					$('.copy, .headline').css('opacity', 0);
+					$('.copy.intro, .headline.intro').css('opacity', 1);
+					break;
+
 				case RACE:
-					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('#defaultCanvas0').css('opacity', 1);
 					$('.copy, .headline').css('opacity', 0);
 					$('.copy.race, .headline.race').css('opacity', 1);
 					break;
 				
 				case ETHNICITY:
-					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('#defaultCanvas0').css('opacity', 1);
 					$('.copy, .headline').css('opacity', 0);
 					$('.copy.ethnicity, .headline.ethnicity').css('opacity', 1);
 					break;
 				
 				case SIZE:
-					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('#defaultCanvas0').css('opacity', 1);
 					$('.copy, .headline').css('opacity', 0);
 					$('.copy.size, .headline.size').css('opacity', 1);
 					break;
 
 				case PERCAPITA:
-					$('#defaultCanvas0, .labels').css('opacity', 1);
+					$('#defaultCanvas0').css('opacity', 1);
 					$('.copy, .headline').css('opacity', 0);
 					$('.copy.percapita, .headline.percapita').css('opacity', 1);
 					break;
 				
 				case OUTRO:
-					$('#defaultCanvas0, .copy, .labels').css('opacity', 0);
+					$('.next').text('Play again');
+					$('#defaultCanvas0, .copy').css('opacity', 0);
 					$('.copy, .headline').css('opacity', 0);
 					$('.copy.outro, .headline.outro').css('opacity', 1);
 					break;
@@ -437,12 +502,3 @@ var App = function() {
 	};
 }
 
-
-function mouseClicked() { 
-
-	if (view === SIZE_COLLAPSE) {
-		targetView = OUTRO;
-	} else {
-		targetView = view + 1;
-	}
-}

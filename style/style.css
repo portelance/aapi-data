@@ -30,7 +30,6 @@
 }
 
 .labels {
-	opacity: 0;
 	-webkit-transition: all 1s;
 	-moz-transition: all 1s;
 	-ms-transition: all 1s;
@@ -87,16 +86,63 @@
 	z-index: 99;
 	font-family: label, arial, sans-serif;
 	font-size: 14px;
-	-webkit-transition: all 1s;
-	-moz-transition: all 1s;
-	-ms-transition: all 1s;
-	transition: all 1s;
 }
 
-.labels .left-label {
+.name-label, .hhincome-label, .hhsize-label, .percapita-label {
 	position: absolute;
 }
 
-.labels .right-label {
-	position: absolute;
+.next {
+	cursor: pointer;
+	font-size: 16px;
+	position: fixed;
+	top: 540px;
+	left: 50px;
+	font-family: copy;
+	color: #999999;
+	z-index: 100;
+	width: 80px;
+	overflow: auto;
+	-webkit-transition: all .2s;
+	-moz-transition: all .2s;
+	-ms-transition: all .2s;
+	transition: all .2s;
+}
+
+.next:hover {
+	color: #000000;
+	-webkit-transition: all .2s;
+	-moz-transition: all .2s;
+	-ms-transition: all .2s;
+	transition: all .2s;
+}
+
+.about-link {
+	cursor: pointer;
+	font-size: 12px;
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	font-family: copy;
+	color: #999999;
+	z-index: 100;
+	width: 40px;
+	overflow: auto;
+	-webkit-transition: all .2s;
+	-moz-transition: all .2s;
+	-ms-transition: all .2s;
+	transition: all .2s;
+}
+
+.about-link:hover {
+	color: #000000;
+	-webkit-transition: all .2s;
+	-moz-transition: all .2s;
+	-ms-transition: all .2s;
+	transition: all .2s;
+}
+
+
+.about {
+	font-family: copy;
 }
