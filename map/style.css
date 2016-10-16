@@ -1,0 +1,20 @@
+.state-name {
+	color: #AAAAAA;
+	cursor: pointer;
+	font-size: 11px;
+}
+
+.state-name:hover {
+	color: #000000;
+}
+
+#vis {
+	position: fixed;
+	left: 500px;
+	top: 200px;
+}
+
+.race {
+	float: left;
+	width: 100px;
+}
