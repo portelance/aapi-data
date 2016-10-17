@@ -77,39 +77,78 @@ var USState = React.createClass({
 var Vis = React.createClass({
 
 	componentDidMount: function() {
-		d3.select('#vis')
-			.append('g')
-			.selectAll('rect')
-			.data([
-				this.props.all, 
-				this.props.hispanic,
-				this.props.black,
-				this.props.white,
-				this.props.asian
-			])
+
+		var width = 100,
+		    height = 100,
+		    radius = Math.min(width, height) / 2;
+
+		var color = d3.scaleOrdinal()
+	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+
+	    var arc = d3.arc()
+	    	.outerRadius(radius - 10)
+	    	.innerRadius(0);
+
+	    var data = [
+	    	this.props.all, 
+			this.props.hispanic,
+			this.props.black,
+			this.props.white,
+			this.props.asian
+	    ];
+
+		var pie = d3.pie()
+			.sort(null);
+
+		var svg = d3.select("#vis").append("svg")
+			.attr("width", width)
+		    .attr("height", height)
+		  	.append("g")
+		    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+		
+		var g = svg.selectAll('.arc')
+			.data(pie(data))
 			.enter()
-			.append('rect')
-			.attr('y', function(d, i) { return i * 20 + 'px'})
-			.attr('width', function(d) { return d / 100000 + 'px'; })
-			.attr('height', '20px');
+			.append('g')
+			.attr('class', 'arc');
+
+		g.append('path')
+			.attr('d', arc)
+			.style('fill', function(d) { return color(d); });
+
 	},
 
 	componentDidUpdate: function() {
 
-		console.log(this.props);
+		var width = 100,
+		    height = 100,
+		    radius = Math.min(width, height) / 2;
 
-		d3.select('#vis')
-			.selectAll('rect')
-			.data([
-				this.props.all, 
-				this.props.hispanic,
-				this.props.black,
-				this.props.white,
-				this.props.asian
-			])
-			.attr('y', function(d, i) { return i * 20 + 'px'})
-			.attr('width', function(d) { return d / 100000 + 'px'; })
-			.attr('height', '20px');
+		var color = d3.scaleOrdinal()
+	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+
+	    var arc = d3.arc()
+	    	.outerRadius(radius - 10)
+	    	.innerRadius(0);
+
+	    var data = [
+	    	this.props.all, 
+			this.props.hispanic,
+			this.props.black,
+			this.props.white,
+			this.props.asian
+	    ];
+
+		var pie = d3.pie()
+			.sort(null);
+		
+		var g = d3.select("#vis").select("svg").selectAll('.arc')
+			.data(pie(data))
+			.attr('class', 'arc');
+			.select('path')
+			.attr('d', arc)
+			.style('fill', function(d) { return color(d); });
+
 	},
 
 	render: function() {
