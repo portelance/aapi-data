@@ -2,16 +2,32 @@
 	color: #AAAAAA;
 	cursor: pointer;
 	font-size: 11px;
+	float: left;
 }
 
 .state-name:hover {
+	color: #666666;
+}
+
+.state-name.selected {
 	color: #000000;
+}
+
+.state-name.selected:hover {
+	color: #000000;
+}
+
+#state-index {
+	margin-top: 50px;
+	margin-left: 50px;
 }
 
 #vis {
 	position: fixed;
-	left: 500px;
-	top: 200px;
+	width: 300px;
+	height: 300px;
+	left: 400px;
+	top: 150px;
 }
 
 .race {

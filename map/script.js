@@ -21,20 +21,30 @@ var USStatesList = React.createClass({
 		USStatesNames = ['All'].concat(USStatesNames);
 
 		var updateCurrentState = this.updateCurrentState;
+		var currentState = this.state.currentState;
+
+		var USStatesRows = [];
+		var currentRow = [];
+		for (var i = 0; i < USStatesNames.length; i++) {
+			var name = USStatesNames[i] || "";
+			if (i % 2 === 0) {
+				currentRow = [name];
+			} else {
+				currentRow.push(name);
+				USStatesRows.push(currentRow);
+			}
+		}
 
 	    return (
-	    	<div className="container">
-	    		{USStatesNames.map(function(name) {
-	    			var statePopulations = USStatesData[name];
-	    			return (
-	    				<USState 
-		    				name={name} 
-		    				all={statePopulations['All']}
-		    				hispanic={statePopulations['Hispanic']}
-		    				black={statePopulations['Black']}
-		    				white={statePopulations['White']}
-		    				asian={statePopulations['Asian']}
+	    	<div id="state-index">
+	    		{USStatesRows.map(function(row) {
+	    			var statePopulationsLeft = USStatesData[row[0]];
+	    			var statePopulationsRight = USStatesData[row[1]];
+					return (
+	    				<USStateRow 
+		    				names={row} 
 		    				updateCurrentState={updateCurrentState}
+		    				currentState={currentState}
 	    				/>
 	    			);	
 	    		})}
@@ -53,18 +63,28 @@ var USStatesList = React.createClass({
 
 
 
-var USState = React.createClass({
+var USStateRow = React.createClass({
 
-	onMouseOver: function() {
-		this.props.updateCurrentState(this.props.name);
+	onClickLeft: function() {
+		this.props.updateCurrentState(this.props.names[0]);
+	},
+
+	onClickRight: function() {
+		this.props.updateCurrentState(this.props.names[1]);
 	},
 
 	render: function() {
+
+		var selectedLeft = this.props.currentState === this.props.names[0] ? "selected" : "";
+		var selectedRight = this.props.currentState === this.props.names[1] ? "selected" : "";
+
 		return (
 			<div>
-				<div className="col-1"></div>
-				<div className="col-11 state-name" onMouseOver={this.onMouseOver}>
-					{this.props.name}
+				<div className={"col-2 state-name " + selectedLeft} onClick={this.onClickLeft}>
+					{this.props.names[0]}
+				</div>
+				<div className={"col-10 state-name " + selectedRight} onClick={this.onClickRight}>
+					{this.props.names[1]}
 				</div>
 			</div>
 		);
@@ -78,19 +98,16 @@ var Vis = React.createClass({
 
 	componentDidMount: function() {
 
-		var width = 100,
-		    height = 100,
-		    radius = Math.min(width, height) / 2;
+		var radius = 100;
 
 		var color = d3.scaleOrdinal()
-	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
 
 	    var arc = d3.arc()
 	    	.outerRadius(radius - 10)
 	    	.innerRadius(0);
 
 	    var data = [
-	    	this.props.all, 
 			this.props.hispanic,
 			this.props.black,
 			this.props.white,
@@ -101,10 +118,10 @@ var Vis = React.createClass({
 			.sort(null);
 
 		var svg = d3.select("#vis").append("svg")
-			.attr("width", width)
-		    .attr("height", height)
+			.attr("width", radius * 2)
+		    .attr("height", radius * 2)
 		  	.append("g")
-		    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+		    .attr("transform", "translate(" + radius + "," + radius + ")")
 		
 		var g = svg.selectAll('.arc')
 			.data(pie(data))
@@ -114,25 +131,22 @@ var Vis = React.createClass({
 
 		g.append('path')
 			.attr('d', arc)
-			.style('fill', function(d) { return color(d); });
+			.style('fill', function(d, i) { return color(i); });
 
 	},
 
 	componentDidUpdate: function() {
 
-		var width = 100,
-		    height = 100,
-		    radius = Math.min(width, height) / 2;
+		var radius = 100;
 
 		var color = d3.scaleOrdinal()
-	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
 
 	    var arc = d3.arc()
 	    	.outerRadius(radius - 10)
 	    	.innerRadius(0);
 
 	    var data = [
-	    	this.props.all, 
 			this.props.hispanic,
 			this.props.black,
 			this.props.white,
@@ -144,10 +158,10 @@ var Vis = React.createClass({
 		
 		var g = d3.select("#vis").select("svg").selectAll('.arc')
 			.data(pie(data))
-			.attr('class', 'arc');
+			.attr('class', 'arc')
 			.select('path')
 			.attr('d', arc)
-			.style('fill', function(d) { return color(d); });
+			.style('fill', function(d, i) { return color(i); });
 
 	},
 
@@ -161,5 +175,5 @@ var Vis = React.createClass({
 });
 
 
-React.render(<USStatesList USStatesData={data.state_populations}/>, document.getElementById('wrapper'));
 
+React.render(<USStatesList USStatesData={data.state_populations}/>, document.getElementById('wrapper'));
