@@ -98,13 +98,18 @@ var Vis = React.createClass({
 
 	componentDidMount: function() {
 
-		var radius = 100;
+		var radius = 200;
+		var labelRadius = 120;
 
 		var color = d3.scaleOrdinal()
 	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
 
 	    var arc = d3.arc()
-	    	.outerRadius(radius - 10)
+	    	.outerRadius(radius)
+	    	.innerRadius(0);
+
+	    var labelArc = d3.arc()
+	    	.outerRadius(radius - 20)
 	    	.innerRadius(0);
 
 	    var data = [
@@ -114,36 +119,50 @@ var Vis = React.createClass({
 			this.props.asian
 	    ];
 
-		var pie = d3.pie()
-			.sort(null);
+		var pie = d3.pie().sort(null)(data);
 
-		var svg = d3.select("#vis").append("svg")
-			.attr("width", radius * 2)
-		    .attr("height", radius * 2)
+		d3.select("#vis")
 		  	.append("g")
-		    .attr("transform", "translate(" + radius + "," + radius + ")")
-		
-		var g = svg.selectAll('.arc')
-			.data(pie(data))
+		    .attr("transform", "translate(" + radius + "," + radius + ")");
+
+		var arcs = d3.select('#vis g')    
+			.selectAll('.arc')
+			.data(pie)
 			.enter()
 			.append('g')
 			.attr('class', 'arc');
 
-		g.append('path')
+		arcs.append('path')
 			.attr('d', arc)
-			.style('fill', function(d, i) { return color(i); });
+			.style('fill', function(d, i) { 
+				return color(i) 
+			});
+
+		arcs.append('text')
+			.attr("transform", function(d) { 
+				return "translate(" + labelArc.centroid(d) + ")"; 
+			})
+			.text(function(d) {
+				return d.data;
+			})
+			.style('font-size', '11px');
 
 	},
 
 	componentDidUpdate: function() {
 
-		var radius = 100;
+		var radius = 200;
+		var labelRadius = 120;
 
 		var color = d3.scaleOrdinal()
 	    	.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b"]);
 
 	    var arc = d3.arc()
-	    	.outerRadius(radius - 10)
+	    	.outerRadius(radius)
+	    	.innerRadius(0);
+
+	    var labelArc = d3.arc()
+	    	.outerRadius(radius - 20)
 	    	.innerRadius(0);
 
 	    var data = [
@@ -153,22 +172,28 @@ var Vis = React.createClass({
 			this.props.asian
 	    ];
 
-		var pie = d3.pie()
-			.sort(null);
-		
-		var g = d3.select("#vis").select("svg").selectAll('.arc')
-			.data(pie(data))
-			.attr('class', 'arc')
-			.select('path')
-			.attr('d', arc)
-			.style('fill', function(d, i) { return color(i); });
+		var pie = d3.pie().sort(null)(data);
+
+		d3.select('#vis g')    
+			.selectAll('.arc path')
+			.data(pie)
+			.attr('d', arc);
+
+		d3.select('#vis g')
+			.selectAll('.arc text')
+			.data(pie)
+			.attr("transform", function(d) { 
+				return "translate(" + labelArc.centroid(d) + ")"; 
+			})
+			.text(function(d) {
+				return d.data;
+			});
 
 	},
 
 	render: function() {
 		return (
-			<svg id="vis">
-			</svg>	
+			<svg id="vis"></svg>	
 		);
 	}
 
